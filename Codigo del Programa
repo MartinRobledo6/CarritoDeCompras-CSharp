@@ -1,0 +1,161 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Carrito_de_compras
+{
+    internal class Program
+    {
+        static int opcion = 0;
+        static string[] productosMenu;
+        static float[] preciosMenu;
+        static string[] carritoProductos = new string[3];
+        static float[] carritoPrecios = new float[3];
+        static int[] carritoCantidades = new int[10];
+        static int productosEnCarrito = 0;
+
+        static void Main(string[] args)
+        {
+
+
+            while (opcion != 6)
+            {
+                MostrarMenu();
+                switch (opcion)
+                {
+                    case 1:
+                        MostrarMenuProductos(out productosMenu, out preciosMenu);
+                        break;
+
+                    case 2:
+                        AgregarProductoAlCarrito();
+                        break;
+
+                    case 3:
+                        MostrarCarrito();
+                        break;
+
+                    case 4:
+                        TotalOrden(carritoPrecios, carritoCantidades, productosEnCarrito);
+                        break;
+
+                    case 5:
+                        VaciarCarrito();
+                        break;
+
+                    case 6:
+                        Console.WriteLine("Saliendo del programa...");
+                        break;
+                }
+            }
+        }
+
+        static void MostrarMenuProductos(out string[] productos, out float[] precios)
+        {
+            Console.WriteLine("El menu es el siguiente:\n" +
+                    "1. Gorras - $10.00\n" +
+                    "2. Remeras - $15.00\n" +
+                    "3. Joggins - $20.00\n");
+            productos = new string[] { "Gorras", "Remeras", "Joggins" };
+            precios = new float[] { 10.00f, 15.00f, 20.00f };
+        }
+        static void AgregarProductoAlCarrito()
+        {
+            Console.WriteLine("Ingrese el nombre del producto que desea agregar al carrito:");
+            string productoSeleccionado = Console.ReadLine();
+            int indiceProducto = -1;
+            for (int i = 0; i < productosMenu.Length; i++)
+            {
+                if (productosMenu[i] == productoSeleccionado)
+                {
+                    indiceProducto = i;
+                    break;
+                }
+            }
+
+            if (indiceProducto == -1)
+            {
+                Console.WriteLine("Producto no encontrado en el menú.");
+                return;
+            }
+
+            Console.WriteLine("Ingrese la cantidad deseada:");
+            ValidarNumeroPositivo();
+            if (int.TryParse(Console.ReadLine(), out int cantidad) && cantidad > 0)
+            {
+                carritoProductos[productosEnCarrito] = productosMenu[indiceProducto];
+                carritoPrecios[productosEnCarrito] = preciosMenu[indiceProducto];
+                carritoCantidades[productosEnCarrito] = cantidad;
+                productosEnCarrito++;
+                Console.WriteLine($"Producto agregado: {productoSeleccionado}, Cantidad: {cantidad}, Precio unitario: ${preciosMenu[indiceProducto]}");
+            }
+            else
+            {
+                Console.WriteLine("Cantidad inválida. Debe ser un número entero mayor a 0.");
+            }
+        }
+
+        static void MostrarCarrito()
+        {
+            Console.WriteLine("Contenido del carrito:");
+            for (int i = 0; i < productosEnCarrito; i++)
+            {
+                float subtotal = carritoPrecios[i] * carritoCantidades[i];
+                Console.WriteLine($"{carritoProductos[i]} - Cantidad: {carritoCantidades[i]}, Precio unitario: ${carritoPrecios[i]}, Subtotal: ${subtotal}");
+            }
+        }
+
+        static void TotalOrden(float[] precios, int[] cantidades, int productosEnCarrito)
+        {
+            float total = 0;
+            for (int i = 0; i < productosEnCarrito; i++)
+            {
+                total += precios[i] * cantidades[i];
+            }
+            Console.WriteLine($"Total de la orden: ${total}");
+        }
+
+        static void VaciarCarrito()
+        {
+            Array.Clear(carritoProductos, 0, carritoProductos.Length);
+            Array.Clear(carritoPrecios, 0, carritoPrecios.Length);
+            Array.Clear(carritoCantidades, 0, carritoCantidades.Length);
+            productosEnCarrito = 0;
+            Console.WriteLine("Carrito vaciado.");
+        }
+
+        static void MostrarMenu()
+        {
+            Console.WriteLine("Seleccione una opción:");
+            Console.WriteLine("1. Mostrar menú de productos");
+            Console.WriteLine("2. Agregar producto al carrito");
+            Console.WriteLine("3. Mostrar carrito");
+            Console.WriteLine("4. Calcular total de la orden");
+            Console.WriteLine("5. Vaciar carrito");
+            Console.WriteLine("6. Salir del programa");
+            if (int.TryParse(Console.ReadLine(), out opcion) && opcion < 1 || opcion > 6)
+            {
+                Console.WriteLine("Opción inválida, por favor intente nuevamente.");
+                opcion = 0;
+            }
+        }
+
+        static int ValidarNumeroPositivo()
+        {
+            Console.Write("Ingrese un número entero positivo: ");
+            string entrada = Console.ReadLine();
+
+            if (int.TryParse(entrada, out int numero) && numero > 0)
+            {
+                return numero;
+            }
+
+            Console.WriteLine(" Entrada inválida. Intente nuevamente.");
+            return ValidarNumeroPositivo(); 
+        }
+
+    }
+}
